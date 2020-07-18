@@ -1,0 +1,17 @@
+---
+
+docker_ce_package: 'docker-ce'
+docker_ce_package_state: present
+
+# Service options.
+docker_ce_service_enabled: true
+
+# Docker Compose options.
+docker_ce_install_compose: true
+docker_ce_compose_version: '1.24.0-rc1'
+docker_ce_compose_path: /usr/local/bin/docker-compose
+
+docker_ce_dowload_url: https://download.docker.com/linux/
+
+# Users who will be added to the docker group.
+docker_ce_users: []

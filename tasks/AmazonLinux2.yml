@@ -1,0 +1,34 @@
+---
+
+- name: Add Docker GPG key.
+  rpm_key:
+    key: https://download.docker.com/linux/centos/gpg
+    state: present
+
+- name: Install Dependency packages
+  yum:
+    name: '{{ item }}'
+    state: latest
+    lock_timeout: 180
+  loop:
+    - amazon-linux-extras
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+
+- name: Add extras repository
+  command: yum-config-manager --enable extras
+
+- name: Ensure old versions of Docker are not installed.
+  package:
+    name:
+      - docker
+      - docker-common
+      - docker-engine
+    state: absent
+
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+    lock_timeout: 180

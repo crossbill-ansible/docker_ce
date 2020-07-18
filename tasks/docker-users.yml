@@ -1,0 +1,16 @@
+---
+
+- name: Ensure docker users are added to the docker group.
+  user:
+    name: '{{ item }}'
+    groups: docker
+    append: true
+  register: docker_group_user_add
+  loop: '{{ docker_ce_users }}'
+
+# Requires a ssh reset after the user is added to docker group
+- name: Reset SSH connection
+  shell: 'sleep 1; pkill -u {{ ansible_ssh_user }} sshd'
+  async: 3
+  poll: 2
+  when: docker_group_user_add is changed

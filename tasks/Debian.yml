@@ -1,0 +1,39 @@
+---
+
+- name: Remove old docker packages
+  apt:
+    name: '{{ item }}'
+    state: absent
+  loop:
+    - docker
+    - docker-engine
+    - docker.io
+
+- name: Update packages
+  apt:
+    upgrade: yes
+    update_cache: yes
+    autoremove: yes
+    force_apt_get: yes
+
+- name: Add dependencies packages
+  apt:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+
+# TODO: molecule test failing at idempotence, Temp resolution: Added changed_when .
+- name: Add Docker’s official GPG key.
+  shell: "curl -sSL 'https://download.docker.com/linux/ubuntu/gpg' | sudo apt-key add -"
+  changed_when: false
+  args:
+    warn: false
+
+- name: Add Docker repository.
+  apt_repository:
+    repo: '{{ docker_ce_apt_repository }}'
+    state: present
+    update_cache: true

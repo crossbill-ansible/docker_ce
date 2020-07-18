@@ -1,0 +1,32 @@
+---
+
+- include_vars: '{{ ansible_os_family }}.yml'
+
+- include_tasks: '{{ ansible_os_family }}.yml'
+  when: ansible_distribution != 'Amazon'
+
+- include_tasks: AmazonLinux2.yml
+  when: ansible_os_family == 'RedHat' and ansible_distribution == 'Amazon'
+
+- name: Install Docker
+  package:
+    name: '{{ docker_ce_package }}'
+    state: '{{ docker_ce_package_state }}'
+  notify: restart docker
+  when: ansible_distribution != 'Amazon'
+
+- name: Install docker via amazon-linux-extras packages
+  command: 'amazon-linux-extras install docker -y'
+  when: ansible_distribution == 'Amazon'
+
+- name: Ensure Docker is started and enabled at boot.
+  service:
+    name: docker
+    state: started
+    enabled: '{{ docker_ce_service_enabled }}'
+
+- include_tasks: docker-compose.yml
+  when: docker_ce_install_compose
+
+- include_tasks: docker-users.yml
+  when: docker_ce_users
